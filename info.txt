@@ -1,0 +1,142 @@
+文件夹 PATH 列表
+卷序列号为 E87D-1CFD
+C:.
+│  info.txt
+│  requirements.txt
+│  
+├─.idea
+│  │  .gitignore
+│  │  misc.xml
+│  │  modules.xml
+│  │  tradeLz.iml
+│  │  vcs.xml
+│  │  workspace.xml
+│  │  
+│  └─inspectionProfiles
+│          profiles_settings.xml
+│          Project_Default.xml
+│          
+├─backtest
+│      analyze_behavior.py
+│      run_backtest.py
+│      
+├─core
+│  │  backtest.py
+│  │  risk_cap.py
+│  │  train_ppo.py
+│  │  __init__.py
+│  │  
+│  ├─logs_rl
+│  │  │  evaluations.npz
+│  │  │  eval_601138_obsS_shieldON.csv
+│  │  │  eval_behavior.csv
+│  │  │  train_behavior.csv
+│  │  │  
+│  │  └─tb
+│  │      └─PPO_1
+│  │              events.out.tfevents.1769532803.zzhen.47816.0
+│  │              
+│  ├─models
+│  │      best_model.zip
+│  │      ppo_601138_obsS_shieldON.zip
+│  │      
+│  └─__pycache__
+│          backtest.cpython-39.pyc
+│          __init__.cpython-39.pyc
+│          
+├─data
+│  │  601138_daily.csv
+│  │  gongye_fulian_features.csv
+│  │  gongye_fulian_features_fixed.csv
+│  │  mixed_market.csv
+│  │  sample.csv
+│  │  trend_up.csv
+│  │  
+│  ├─features
+│  └─raw
+├─envs
+│  │  trading_env.py
+│  │  wrappers.py
+│  │  __init__.py
+│  │  
+│  └─__pycache__
+│          trading_env.cpython-312.pyc
+│          trading_env.cpython-39.pyc
+│          wrappers.cpython-39.pyc
+│          __init__.cpython-39.pyc
+│          
+├─features
+│      build_features.py
+│      
+├─logs
+├─policies
+│  │  ddcontrol.py
+│  │  ddcontrol_with_features.py
+│  │  policies.py
+│  │  ppo_policy.py
+│  │  __init__.py
+│  │  
+│  └─__pycache__
+│          ddcontrol.cpython-39.pyc
+│          ddcontrol_with_features.cpython-39.pyc
+│          policies.cpython-39.pyc
+│          ppo_policy.cpython-39.pyc
+│          __init__.cpython-39.pyc
+│          
+├─rl
+│      eval_ppo.py
+│      train_ppo.py
+│      
+├─sanbox
+├─script
+│  │  fatch_gongyefulian_data.py
+│  │  fetch_ashare_daily.py
+│  │  fix_features.py
+│  │  make_mixed_market.py
+│  │  pandas.py
+│  │  __init__.py
+│  │  
+│  └─__pycache__
+├─test
+│      test.py
+│      test_env_logic.py
+│      
+├─webapp
+│  │  app.db
+│  │  app.py
+│  │  db.py
+│  │  requirements_web.txt
+│  │  schemas.py
+│  │  __init__.py
+│  │  
+│  ├─cache
+│  │      601138_20180101_20261231_qfq.csv
+│  │      
+│  ├─services
+│  │  │  backtest_service.py
+│  │  │  data_service.py
+│  │  │  feature_service.py
+│  │  │  __init__.py
+│  │  │  
+│  │  └─__pycache__
+│  │          backtest_service.cpython-39.pyc
+│  │          data_service.cpython-39.pyc
+│  │          feature_service.cpython-39.pyc
+│  │          __init__.cpython-39.pyc
+│  │          
+│  ├─static
+│  │      style.css
+│  │      
+│  ├─templates
+│  │      backtest.html
+│  │      base.html
+│  │      data.html
+│  │      index.html
+│  │      
+│  └─__pycache__
+│          app.cpython-39.pyc
+│          db.cpython-39.pyc
+│          schemas.cpython-39.pyc
+│          __init__.cpython-39.pyc
+│          
+└─__pycache__

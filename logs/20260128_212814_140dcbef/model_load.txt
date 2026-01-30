@@ -1,0 +1,6 @@
+model_path_input = core\models\ppo_601138_obsS_shieldON.zip
+model_path_abs   = C:\Users\Administrator\PycharmProjects\tradeLz\core\models\ppo_601138_obsS_shieldON.zip
+exists           = True
+mtime_epoch      = 1769606774.5949614
+observation_space= Box(-inf, inf, (5,), float32)
+action_space     = Box(-1.0, 1.0, (1,), float32)

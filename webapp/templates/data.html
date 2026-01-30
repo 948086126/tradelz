@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>数据拉取（AkShare）</h2>
+<form method="post" action="/data/fetch">
+  <label>股票代码: <input name="symbol" value="601138"/></label><br/>
+  <label>开始日期(YYYYMMDD): <input name="start_date" value="20180101"/></label><br/>
+  <label>结束日期(YYYYMMDD): <input name="end_date" value="20261231"/></label><br/>
+  <label>复权: <input name="adjust" value="qfq"/></label><br/>
+  <button type="submit">拉取并缓存</button>
+</form>
+<p class="msg">{{ msg }}</p>
+{% endblock %}

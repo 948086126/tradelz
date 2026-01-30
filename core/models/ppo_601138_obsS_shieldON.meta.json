@@ -1,0 +1,47 @@
+{
+  "symbol": "601138",
+  "obs_mode": "S",
+  "obs_idxs": [
+    0,
+    1,
+    2,
+    3,
+    5
+  ],
+  "use_action_shield": true,
+  "env_kwargs_phase1": {
+    "max_step_change": 0.1,
+    "hold_a": 0.0006,
+    "hold_b": 0.0006,
+    "use_action_shield": true,
+    "train_random_start_pos": true,
+    "random_pos_prob": 0.8,
+    "random_pos_low": 0.1,
+    "random_pos_high": 0.6,
+    "print_first_n": 0,
+    "log_dir": "logs_rl",
+    "cost_rate": 0.0002,
+    "ddi_penalty": 0.2,
+    "turnover_penalty": 0.0,
+    "log_name": "train_behavior_phase1.csv"
+  },
+  "env_kwargs_phase2": {
+    "max_step_change": 0.1,
+    "hold_a": 0.0006,
+    "hold_b": 0.0006,
+    "use_action_shield": true,
+    "train_random_start_pos": true,
+    "random_pos_prob": 0.8,
+    "random_pos_low": 0.1,
+    "random_pos_high": 0.6,
+    "print_first_n": 0,
+    "log_dir": "logs_rl",
+    "cost_rate": 0.001,
+    "ddi_penalty": 2.0,
+    "turnover_penalty": 0.0005,
+    "log_name": "train_behavior_phase2.csv"
+  },
+  "train_split": 0.8,
+  "seed": 42,
+  "total_timesteps": 300000
+}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>回测（先特征链路）</h2>
+
+<form method="post" action="/backtest/ddcontrol">
+  <label>选择 dataset:</label>
+  <select name="dataset_id">
+    {% for d in datasets %}
+      <option value="{{ d['id'] }}">{{ d['id'] }} | {{ d['symbol'] }} | {{ d['start_date'] }}-{{ d['end_date'] }} | {{ d['adjust'] }}</option>
+    {% endfor %}
+  </select>
+  <br/><br/>
+
+  <label>rolling DD window: <input name="dd_window" value="252"/></label><br/>
+  <label>dd_points: <input name="dd_points" value="0.02,0.06,0.10,0.18"/></label><br/>
+  <label>pos_points: <input name="pos_points" value="0.8,0.6,0.35,0.1"/></label><br/>
+  <button type="submit">生成特征（下一步接回测）</button>
+</form>
+
+<p class="msg">{{ msg }}</p>
+
+{% if result %}
+  <h3>预览</h3>
+  {{ result.preview_head | safe }}
+{% endif %}
+{% endblock %}
