@@ -29,6 +29,8 @@ def load_gongye_fulian_daily():
 
     return df
 
+
+
 def build_risk_features(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
 
