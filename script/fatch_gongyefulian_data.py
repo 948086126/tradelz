@@ -22,6 +22,7 @@ def load_gongye_fulian_daily():
         "成交量": "volume"
     })
 
+
     df["date"] = pd.to_datetime(df["date"])
     df = df.sort_values("date").reset_index(drop=True)
 
