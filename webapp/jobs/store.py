@@ -14,7 +14,8 @@ MODEL_INDEX = "tradelz:models"  # zset by created_at
 
 
 def _redis() -> Redis:
-    redis_url = os.getenv("REDIS_URL", "redis://127.0.0.1:6379/0")
+    redis_url = os.getenv("REDIS_URL", "redis://82.157.246.81:6379/0")
+    # redis_url = os.getenv("REDIS_URL", "redis://127.0.0.1:6379/0")
     return Redis.from_url(redis_url, decode_responses=True)
 
 
@@ -109,3 +110,4 @@ def list_models(limit: int = 50) -> List[Dict[str, Any]]:
         if raw:
             out.append(json.loads(raw))
     return out
+

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>里程碑 A - 资金曲线展示</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .content {
+            padding: 30px;
+        }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .metric-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        .metric-card:hover {
+            transform: translateY(-5px);
+        }
+        .metric-card h3 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        .metric-card p {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+        }
+        .metric-card.positive p {
+            color: #10b981;
+        }
+        .metric-card.negative p {
+            color: #ef4444;
+        }
+        .chart-section {
+            margin-bottom: 40px;
+        }
+        .chart-section h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+            border-left: 4px solid #667eea;
+            padding-left: 15px;
+        }
+        .chart-container {
+            position: relative;
+            height: 400px;
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .no-data {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        .no-data h2 {
+            font-size: 24px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .btn:hover {
+            background: #5568d3;
+        }
+        .nav-links {
+            padding: 20px 30px;
+            background: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .nav-links a {
+            margin-right: 20px;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-links">
+            <a href="/">← 首页</a>
+            <a href="/train">训练管理</a>
+            <a href="/backtest">回测管理</a>
+        </div>
+
+        <div class="header">
+            <h1>🎯 里程碑 A - 日频闭环跑通</h1>
+            <p>PPO 模型 + 开盘一次性成交回测</p>
+        </div>
+
+        <div class="content">
+            {% if not has_data %}
+            <div class="no-data">
+                <h2>暂无回测数据</h2>
+                <p>请先运行回测任务</p>
+                <a href="/train" class="btn">前往训练页面</a>
+            </div>
+            {% else %}
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <h3>策略名称</h3>
+                    <p style="font-size: 18px;">{{ run.policy_name }}</p>
+                </div>
+                <div class="metric-card">
+                    <h3>股票代码</h3>
+                    <p style="font-size: 18px;">{{ run.symbol }}</p>
+                </div>
+                <div class="metric-card {% if run.metrics.get('total_return', 0) > 0 %}positive{% else %}negative{% endif %}">
+                    <h3>总收益率</h3>
+                    <p>{{ "%.2f"|format(run.metrics.get('total_return', 0) * 100) }}%</p>
+                </div>
+                <div class="metric-card negative">
+                    <h3>最大回撤</h3>
+                    <p>{{ "%.2f"|format(run.metrics.get('max_drawdown', 0) * 100) }}%</p>
+                </div>
+                <div class="metric-card">
+                    <h3>夏普比率</h3>
+                    <p>{{ "%.2f"|format(run.metrics.get('sharpe', 0)) }}</p>
+                </div>
+                <div class="metric-card">
+                    <h3>平均仓位</h3>
+                    <p>{{ "%.2f"|format(run.metrics.get('avg_position', 0) * 100) }}%</p>
+                </div>
+            </div>
+
+            <div class="chart-section">
+                <h2>📈 资金曲线</h2>
+                <div class="chart-container">
+                    <canvas id="equityChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-section">
+                <h2>📊 仓位变化</h2>
+                <div class="chart-container">
+                    <canvas id="positionChart"></canvas>
+                </div>
+            </div>
+
+            <script>
+                fetch('/api/backtest/equity/{{ run.run_id }}')
+                    .then(res => {
+                        if (!res.ok) throw new Error('Failed to load data');
+                        return res.json();
+                    })
+                    .then(data => {
+                        // 资金曲线图
+                        const ctx1 = document.getElementById('equityChart').getContext('2d');
+                        new Chart(ctx1, {
+                            type: 'line',
+                            data: {
+                                labels: data.dates,
+                                datasets: [{
+                                    label: '资金曲线',
+                                    data: data.equity,
+                                    borderColor: '#10b981',
+                                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                    borderWidth: 2,
+                                    tension: 0.4,
+                                    fill: true,
+                                    pointRadius: 0,
+                                    pointHoverRadius: 5,
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: { display: true },
+                                    tooltip: {
+                                        mode: 'index',
+                                        intersect: false,
+                                    }
+                                },
+                                scales: {
+                                    x: {
+                                        ticks: { maxTicksLimit: 10 }
+                                    },
+                                    y: {
+                                        beginAtZero: false
+                                    }
+                                }
+                            }
+                        });
+
+                        // 仓位图
+                        const ctx2 = document.getElementById('positionChart').getContext('2d');
+                        new Chart(ctx2, {
+                            type: 'line',
+                            data: {
+                                labels: data.dates,
+                                datasets: [{
+                                    label: '目标仓位',
+                                    data: data.position,
+                                    borderColor: '#3b82f6',
+                                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                    borderWidth: 2,
+                                    stepped: true,
+                                    fill: true,
+                                    pointRadius: 0,
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: { display: true }
+                                },
+                                scales: {
+                                    x: {
+                                        ticks: { maxTicksLimit: 10 }
+                                    },
+                                    y: {
+                                        min: 0,
+                                        max: 1,
+                                        ticks: {
+                                            callback: function(value) {
+                                                return (value * 100).toFixed(0) + '%';
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    })
+                    .catch(err => {
+                        console.error('Error loading chart data:', err);
+                        document.querySelector('.content').innerHTML =
+                            '<div class="no-data"><h2>加载数据失败</h2><p>' + err.message + '</p></div>';
+                    });
+            </script>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

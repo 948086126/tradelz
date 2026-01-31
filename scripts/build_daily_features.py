@@ -1,4 +1,4 @@
-# tradelz/script/build_daily_features.py
+# tradelz/scripts/build_daily_features.py
 
 import akshare as ak
 import pandas as pd

@@ -320,3 +320,63 @@ def runs_get(run_id: str):
 @app.get("/train/models/list")
 def train_models_list(limit: int = 50):
     return {"items": list_models(limit=limit)}
+
+
+# ===== 新增：里程碑 A - 资金曲线展示 =====
+
+# ===== 里程碑 A：资金曲线展示 =====
+
+@app.get("/api/backtest/equity/{run_id}")
+def get_equity_data(run_id: str):
+    """
+    返回指定 run_id 的资金曲线数据（用于前端绘图）
+    """
+    run = get_run(run_id)
+    if run is None:
+        raise HTTPException(status_code=404, detail="run not found")
+
+    csv_path = run.get("csv_path")
+    if not csv_path or not os.path.exists(csv_path):
+        raise HTTPException(status_code=404, detail="CSV file not found")
+
+    df = pd.read_csv(csv_path)
+
+    # 确保必要的列存在
+    required_cols = ["date", "equity", "position"]
+    missing = [c for c in required_cols if c not in df.columns]
+    if missing:
+        raise HTTPException(status_code=500, detail=f"CSV missing columns: {missing}")
+
+    # 转换为前端需要的格式
+    data = {
+        "dates": df["date"].tolist(),
+        "equity": df["equity"].tolist(),
+        "position": df["position"].tolist(),
+    }
+
+    return data
+
+
+@app.get("/milestone-a", response_class=HTMLResponse)
+def milestone_a_page(request: Request):
+    """
+    里程碑 A 专用页面：展示最新的回测结果
+    """
+    runs = list_runs(limit=1)  # 获取最新的一条回测记录
+
+    if not runs:
+        return templates.TemplateResponse(
+            "milestone_a.html",
+            {"request": request, "has_data": False, "run": None},
+        )
+
+    latest_run = runs[0]
+
+    return templates.TemplateResponse(
+        "milestone_a.html",
+        {
+            "request": request,
+            "has_data": True,
+            "run": latest_run,
+        },
+    )
