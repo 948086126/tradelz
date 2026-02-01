@@ -44,21 +44,21 @@ app.conf.update(
 app.conf.beat_schedule = {
     # 每天15:05运行预测
     'daily-prediction': {
-        'task': 'tasks.trading_tasks.daily_prediction_task',
+        'tasks': 'tasks.trading_tasks.daily_prediction_task',
         'schedule': crontab(hour=15, minute=5),
         'args': ()
     },
 
     # 交易日早上9:25准备
     'morning-prepare': {
-        'task': 'tasks.trading_tasks.prepare_trading_task',
+        'tasks': 'tasks.trading_tasks.prepare_trading_task',
         'schedule': crontab(hour=9, minute=25, day_of_week='1-5'),
         'args': ()
     },
 
     # 每5分钟检查是否需要执行TWAP
     'check-twap-execution': {
-        'task': 'tasks.trading_tasks.check_twap_task',
+        'tasks': 'tasks.trading_tasks.check_twap_task',
         'schedule': crontab(minute='*/5', day_of_week='1-5'),
         'args': ()
     },

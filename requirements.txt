@@ -9,13 +9,29 @@ seaborn==0.12.2
 
 # ===== 强化学习 =====
 torch==1.13.1
+stable-baselines3==2.0.0  # ✅ 新增：兼容 torch 1.13.1
+gymnasium==0.28.1         # ✅ 新增：stable-baselines3 的依赖
 
 # ===== 金融相关 =====
 yfinance==0.2.28
 ta==0.10.2
+akshare==1.11.0          # ✅ 新增：如果需要 A 股数据
 
 # ===== 工程工具 =====
 tqdm==4.66.1
 pyyaml==6.0
 loguru==0.7.2
+
+# ===== Celery 任务调度 =====
 celery==5.3.4
+redis==4.6.0             # ✅ 新增：Celery 的消息队列
+
+# ===== 环境变量管理 =====
+python-dotenv==1.0.0     # ✅ 新增：加载 .env 文件
+
+# ===== Web 相关（可选）=====
+# flask==2.3.3
+# flask-cors==4.0.0
+
+# ===== 邮件发送（Python 内置，无需安装）=====
+# smtplib, email 是 Python 标准库
