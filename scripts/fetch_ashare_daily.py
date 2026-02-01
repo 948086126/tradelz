@@ -57,3 +57,5 @@ def fetch_daily_ohlcv():
 
 if __name__ == "__main__":
     fetch_daily_ohlcv()
+
+

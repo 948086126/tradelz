@@ -278,3 +278,23 @@ if __name__ == "__main__":
     notifier.send_prediction_result(test_predictions)
 
     print("✅ 测试完成！请检查企业微信群是否收到消息")
+
+
+python << 'EOF'
+from tasks.trading_tasks import manual_prediction
+
+print("🚀 测试手动预测任务...")
+result = manual_prediction.delay()
+print(f"任务 ID: {result.id}")
+
+print("⏳ 等待结果（最多30秒）...")
+try:
+    output = result.get(timeout=30)
+    print(f"\n✅ 任务成功:")
+    print(output)
+except Exception as e:
+    print(f"❌ 任务失败:")
+    print(e)
+    import traceback
+    traceback.print_exc()
+EOF
