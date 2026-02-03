@@ -1,0 +1,104 @@
+{% extends "_layout.html" %}
+{% set title = "里程碑 A - 回测结果" %}
+
+{% block content %}
+
+{% if not has_data %}
+<div class="card p-5 text-center">
+  <h4 class="mb-3">暂无回测数据</h4>
+  <p class="text-muted">请先运行回测任务</p>
+  <a href="/train" class="btn btn-primary">前往训练</a>
+</div>
+{% else %}
+
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card p-3 text-center">
+      <div class="text-muted">策略</div>
+      <div class="metric-value">{{ run.policy_name }}</div>
+    </div>
+  </div>
+  <div class="col-md-2">
+    <div class="card p-3 text-center">
+      <div class="text-muted">股票</div>
+      <div class="metric-value">{{ run.symbol }}</div>
+    </div>
+  </div>
+  <div class="col-md-2">
+    <div class="card p-3 text-center">
+      <div class="text-muted">总收益</div>
+      <div class="metric-value text-success">
+        {{ "%.2f"|format(run.metrics.get("total_return",0)*100) }}%
+      </div>
+    </div>
+  </div>
+  <div class="col-md-2">
+    <div class="card p-3 text-center">
+      <div class="text-muted">最大回撤</div>
+      <div class="metric-value text-danger">
+        {{ "%.2f"|format(run.metrics.get("max_drawdown",0)*100) }}%
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card p-3 text-center">
+      <div class="text-muted">Sharpe</div>
+      <div class="metric-value">
+        {{ "%.2f"|format(run.metrics.get("sharpe",0)) }}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card p-4 mb-4">
+  <h5 class="mb-3">资金曲线</h5>
+  <div style="height:360px">
+    <canvas id="equityChart"></canvas>
+  </div>
+</div>
+
+<div class="card p-4">
+  <h5 class="mb-3">仓位变化</h5>
+  <div style="height:300px">
+    <canvas id="positionChart"></canvas>
+  </div>
+</div>
+
+<script>
+fetch('/api/backtest/equity/{{ run.run_id }}')
+  .then(r => r.json())
+  .then(data => {
+    new Chart(document.getElementById("equityChart"), {
+      type: "line",
+      data: {
+        labels: data.dates,
+        datasets: [{
+          label: "Equity",
+          data: data.equity,
+          borderColor: "#198754",
+          tension: .3,
+          pointRadius: 0
+        }]
+      },
+      options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    new Chart(document.getElementById("positionChart"), {
+      type: "line",
+      data: {
+        labels: data.dates,
+        datasets: [{
+          label: "Position",
+          data: data.position,
+          stepped: true,
+          borderColor: "#0d6efd",
+          pointRadius: 0
+        }]
+      },
+      options: { responsive: true, maintainAspectRatio: false }
+    });
+  });
+</script>
+
+{% endif %}
+{% endblock %}

@@ -1,107 +1,158 @@
-<!doctype html>
-<html>
-<head>
-  <meta charset="utf-8"/>
-  <title>tradeLz - Train</title>
-  <style>
-    body { max-width: 1100px; margin: 0 auto; padding: 16px; font-family: Arial; }
-    .row { display: flex; gap: 12px; }
-    .col { flex: 1; }
-    .card { border: 1px solid #ddd; border-radius: 12px; padding: 12px; margin-bottom: 12px; }
-    input, select { padding: 6px; margin: 4px 0; width: 100%; box-sizing: border-box; }
-    button { padding: 8px 14px; cursor: pointer; }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { padding: 6px; border-bottom: 1px solid #eee; font-size: 13px; }
-    pre { background: #111; color: #0f0; padding: 10px; border-radius: 8px; overflow-x: auto; max-height: 360px; overflow-y: auto;}
-    .badge { padding: 2px 8px; border-radius: 999px; border: 1px solid #ccc; font-size: 12px; }
-    .ok { background:#eaffea; border-color:#7ad67a; }
-    .run { background:#fff6d8; border-color:#f2c04f; }
-    .fail { background:#ffe1e1; border-color:#ff7b7b; }
-    .muted { color:#666; font-size:12px; }
-    a { color: #1a73e8; text-decoration: none; }
-  </style>
-</head>
-<body>
-  <h2>Train PPO (Online)</h2>
-  <div class="muted">Auto refresh every 3s. Click Job ID to view log.</div>
+{% extends "_layout.html" %}
+{% set title = "训练管理 - tradeLz" %}
 
-  <div class="row">
-    <div class="col">
-      <div class="card">
-        <h3>Start Train</h3>
-        <form id="f">
-          <label>Data CSV</label>
-          <input name="data" value="data/gongye_fulian_features.csv"/>
+{% block content %}
 
-          <label>Symbol</label>
-          <input name="symbol" value="601138"/>
+<div class="row g-4">
 
-          <label>Obs Mode</label>
-          <select name="obs_mode">
-            <option value="S" selected>S</option>
-            <option value="M">M</option>
-            <option value="L">L</option>
-          </select>
+  <!-- ================= 左侧：启动训练 & 日志 ================= -->
+  <div class="col-lg-4">
 
-          <label>Phase</label>
-          <select name="phase">
-            <option value="1">1</option>
-            <option value="2" selected>2</option>
-          </select>
+    <!-- Start Train -->
+    <div class="card p-4 mb-4">
+      <h5 class="mb-3">🚀 启动训练</h5>
 
-          <label>Total Steps</label>
-          <input name="total_steps" value="300000"/>
+      <form id="f">
 
-          <label>Seed</label>
-          <input name="seed" value="42"/>
+        <div class="mb-3">
+          <label class="form-label">数据 CSV</label>
+          <input class="form-control" name="data" value="data/gongye_fulian_features.csv">
+        </div>
 
-          <label><input type="checkbox" name="shield" checked/> Shield</label><br/>
-          <label><input type="checkbox" name="use_vecnorm" checked/> VecNormalize</label><br/><br/>
+        <div class="row">
+          <div class="col-6 mb-3">
+            <label class="form-label">股票代码</label>
+            <input class="form-control" name="symbol" value="601138">
+          </div>
+          <div class="col-6 mb-3">
+            <label class="form-label">观测模式</label>
+            <select class="form-select" name="obs_mode">
+              <option value="S" selected>S</option>
+              <option value="M">M</option>
+              <option value="L">L</option>
+            </select>
+          </div>
+        </div>
 
-          <label>Init Model (optional)</label>
-          <input name="init_model" value=""/>
+        <div class="row">
+          <div class="col-6 mb-3">
+            <label class="form-label">Phase</label>
+            <select class="form-select" name="phase">
+              <option value="1">1</option>
+              <option value="2" selected>2</option>
+            </select>
+          </div>
+          <div class="col-6 mb-3">
+            <label class="form-label">Total Steps</label>
+            <input class="form-control" name="total_steps" value="300000">
+          </div>
+        </div>
 
-          <button type="submit">Start</button>
-        </form>
+        <div class="row">
+          <div class="col-6 mb-3">
+            <label class="form-label">Seed</label>
+            <input class="form-control" name="seed" value="42">
+          </div>
+          <div class="col-6 mb-3">
+            <label class="form-label">初始模型（可选）</label>
+            <input class="form-control" name="init_model" placeholder="model_xxx.zip">
+          </div>
+        </div>
 
-        <div id="msg"></div>
-      </div>
+        <div class="form-check form-switch mb-2">
+          <input class="form-check-input" type="checkbox" name="shield" checked>
+          <label class="form-check-label">Action Shield</label>
+        </div>
 
-      <div class="card">
-        <h3>Log Viewer</h3>
-        <div class="muted">Selected Job: <span id="selJob">None</span></div>
-        <pre id="logBox">Select a job to view log...</pre>
-      </div>
+        <div class="form-check form-switch mb-3">
+          <input class="form-check-input" type="checkbox" name="use_vecnorm" checked>
+          <label class="form-check-label">VecNormalize</label>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">
+          ▶ 开始训练
+        </button>
+      </form>
+
+      <div id="msg" class="mt-3"></div>
     </div>
 
-    <div class="col">
-      <div class="card">
-        <h3>Jobs</h3>
-        <table id="jobsTbl">
-          <tr><th>Job</th><th>Status</th><th>Updated</th><th>Log Path</th></tr>
-        </table>
+    <!-- Log Viewer -->
+    <div class="card p-4">
+      <h5 class="mb-2">📜 训练日志</h5>
+      <div class="text-muted mb-2">
+        当前任务：<span id="selJob">未选择</span>
       </div>
-
-      <div class="card">
-        <h3>Models</h3>
-        <table id="modelsTbl">
-          <tr><th>ID</th><th>Symbol</th><th>Obs</th><th>Phase</th><th>Shield</th><th>Model Path</th></tr>
-        </table>
-      </div>
+      <pre id="logBox" style="
+        background:#0b0f14;
+        color:#9ef01a;
+        font-size:12px;
+        padding:14px;
+        border-radius:10px;
+        height:360px;
+        overflow:auto;
+      ">请选择一个任务查看日志...</pre>
     </div>
+
   </div>
+
+  <!-- ================= 右侧：Jobs & Models ================= -->
+  <div class="col-lg-8">
+
+    <!-- Jobs -->
+    <div class="card p-4 mb-4">
+      <h5 class="mb-3">🧠 训练任务</h5>
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle" id="jobsTbl">
+          <thead class="table-light">
+            <tr>
+              <th>Job ID</th>
+              <th>状态</th>
+              <th>更新时间</th>
+              <th>日志路径</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Models -->
+    <div class="card p-4">
+      <h5 class="mb-3">📦 已训练模型</h5>
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle" id="modelsTbl">
+          <thead class="table-light">
+            <tr>
+              <th>ID</th>
+              <th>股票</th>
+              <th>Obs</th>
+              <th>Phase</th>
+              <th>Shield</th>
+              <th>模型路径</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+</div>
 
 <script>
 let selectedJobId = null;
 
 function statusBadge(status){
   const s = (status||"").toLowerCase();
-  let cls = "";
-  if (s === "done") cls = "badge ok";
-  else if (s === "running" || s === "queued") cls = "badge run";
-  else if (s === "failed") cls = "badge fail";
-  else cls = "badge";
-  return `<span class="${cls}">${status}</span>`;
+  let cls = "secondary";
+  if (s === "done") cls = "success";
+  else if (s === "running" || s === "queued") cls = "warning";
+  else if (s === "failed") cls = "danger";
+  return `<span class="badge bg-${cls}">${status}</span>`;
 }
 
 async function refreshLists(){
@@ -110,40 +161,39 @@ async function refreshLists(){
   const jd = await jr.json();
   const jobs = jd.items || [];
 
-  const jt = document.getElementById("jobsTbl");
-  jt.innerHTML = `<tr><th>Job</th><th>Status</th><th>Updated</th><th>Log Path</th></tr>` + jobs.map(j => {
-    const jobId = j.job_id;
-    const upd = j.updated_at;
-    const lp = j.log_path || "";
-    const st = statusBadge(j.status);
-    return `<tr>
-      <td><a href="#" onclick="selectJob('${jobId}');return false;">${jobId}</a></td>
-      <td>${st}</td>
-      <td>${upd}</td>
-      <td class="muted">${lp}</td>
-    </tr>`;
-  }).join("");
+  const jt = document.querySelector("#jobsTbl tbody");
+  jt.innerHTML = jobs.map(j => `
+    <tr>
+      <td>
+        <a href="#" onclick="selectJob('${j.job_id}');return false;">
+          ${j.job_id}
+        </a>
+      </td>
+      <td>${statusBadge(j.status)}</td>
+      <td class="text-muted">${j.updated_at || ""}</td>
+      <td class="text-muted small">${j.log_path || ""}</td>
+    </tr>
+  `).join("");
 
   // models
   const mr = await fetch("/train/models/list?limit=50");
   const md = await mr.json();
   const models = md.items || [];
 
-  const mt = document.getElementById("modelsTbl");
-  mt.innerHTML = `<tr><th>ID</th><th>Symbol</th><th>Obs</th><th>Phase</th><th>Shield</th><th>Model Path</th></tr>` + models.map(m => {
-    return `<tr>
+  const mt = document.querySelector("#modelsTbl tbody");
+  mt.innerHTML = models.map(m => `
+    <tr>
       <td>${m.model_id}</td>
       <td>${m.symbol}</td>
       <td>${m.obs_mode}</td>
       <td>${m.phase}</td>
       <td>${m.shield}</td>
-      <td class="muted">${m.model_path}</td>
-    </tr>`;
-  }).join("");
+      <td class="text-muted small">${m.model_path}</td>
+    </tr>
+  `).join("");
 
-  // if selected job, refresh log too
   if (selectedJobId){
-    await refreshLog();
+    refreshLog();
   }
 }
 
@@ -178,7 +228,8 @@ document.getElementById("f").addEventListener("submit", async (e) => {
     body: JSON.stringify(obj)
   });
   const data = await res.json();
-  document.getElementById("msg").innerHTML = "<pre>"+JSON.stringify(data,null,2)+"</pre>";
+  document.getElementById("msg").innerHTML =
+    `<div class="alert alert-info small"><pre class="mb-0">${JSON.stringify(data,null,2)}</pre></div>`;
   if (data.job_id){
     selectJob(data.job_id);
   }
@@ -188,5 +239,4 @@ setInterval(refreshLists, 3000);
 refreshLists();
 </script>
 
-</body>
-</html>
+{% endblock %}
